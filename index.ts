@@ -24,7 +24,7 @@ function If (paramsOrCondition: GulpIfOpts | Condition, opts?: MinimatchOpts): N
 }
 
 class GulpIf {
-    constructor(private condition: Condition, private opts?: MinimatchOpts) {}
+    constructor(private _condition: Condition, private _opts?: MinimatchOpts) {}
 
     public then(stream: ThunkStream, ...args: any[]): GulpIfBranch {
         let boundThunk = stream;
@@ -36,7 +36,7 @@ class GulpIf {
         } else {
             boundThunk = stream.bind(stream, ...args);
         }
-        return new GulpIfBranch(this.condition, boundThunk, this.opts);
+        return new GulpIfBranch(this._condition, boundThunk, this._opts);
     }
 }
 
