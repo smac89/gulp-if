@@ -40,7 +40,8 @@ gulp.task('test2', () => {
 
 // After this task runs, we should find a file called index-and-nonjs.txt in the
 // dist folder. This file will contain the contents of index.js as well as
-// the contents of all non-js files
+// the contents of all non-js files. Another file called all-js.txt will contain
+// the contents of the rest of the .js files
 gulp.task('test3', () => {
     return gulp.src(['**/*', '!dist/**/*', '!dist/']).pipe(
         gulpIf({
@@ -48,6 +49,6 @@ gulp.task('test3', () => {
             thenStream: gulpIf('INDEX.JS', {nocase: true}).then(concat, 'found.index.js')
         }).otherwise(concat, 'rest.txt'))
         .pipe(gulpIf('*.+(index.js|txt)').then(concat('index-and-nonjs.txt'))
-            .otherwise(concat, 'something.txt'))
+            .otherwise(concat, 'all-js.txt'))
         .pipe(gulp.dest('dist'));
 });
