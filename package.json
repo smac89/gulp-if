@@ -13,19 +13,32 @@
     "ternary"
   ],
   "dependencies": {
+    "@types/merge2": "^0.3.30",
+    "@types/through2": "^2.0.33",
     "gulp-match": "^1.0.3",
+    "merge2": "^1.1.0",
     "ternary-stream": "^2.0.1",
-    "through2": "^2.0.1"
+    "through2": "^2.0.3"
   },
   "devDependencies": {
+    "@types/gulp": "^4.0.4",
+    "@types/gulp-concat": "0.0.30",
+    "@types/gulp-plumber": "0.0.30",
+    "@types/gulp-util": "^3.0.31",
     "end-of-stream": "^1.1.0",
     "graceful-fs": "^4.1.10",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-util": "^3.0.8",
     "jshint": "^2.9.4",
     "mkdirp": "^0.5.1",
     "mocha": "^3.1.2",
     "rimraf": "^2.5.4",
     "should": "^11.1.1",
     "stream-exhaust": "^1.0.1",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1",
     "vinyl-fs": "^2.4.4"
   },
   "scripts": {

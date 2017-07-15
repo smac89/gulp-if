@@ -4,6 +4,12 @@ var match = require('gulp-match');
 var ternaryStream = require('ternary-stream');
 var through2 = require('through2');
 
+function GulpIf(condition) {
+	if (typeof condition === 'function') {
+		condition = condition();
+	}
+}
+
 module.exports = function (condition, trueChild, falseChild, minimatchOptions) {
 	if (!trueChild) {
 		throw new Error('gulp-if: child action is required');

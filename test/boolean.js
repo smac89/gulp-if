@@ -3,6 +3,7 @@
 'use strict';
 
 var gulpif = require('../');
+var gutil = require('gulp-util');
 
 var through = require('through2');
 require('should');
@@ -17,18 +18,17 @@ describe('gulp-if', function() {
 			// Arrange
 			var condition = true;
 			var called = 0;
-			var fakeFile = {
+			var fakeFile = new gutil.File({
 				path: tempFile,
 				contents: new Buffer(tempFileContent)
-			};
+			});
 
 			var s = gulpif(condition, through.obj(function (file, enc, cb) {
 				// Test that file got passed through
 				(file === fakeFile).should.equal(true);
 
 				called++;
-				this.push(file);
-				cb();
+				cb(null, file);
 			}));
 
 			// Assert
@@ -48,10 +48,10 @@ describe('gulp-if', function() {
 			// Arrange
 			var condition = false;
 			var called = 0;
-			var fakeFile = {
+			var fakeFile = new gutil.File({
 				path: tempFile,
 				contents: new Buffer(tempFileContent)
-			};
+			});
 
 			var s = gulpif(condition, through.obj(function (file, enc, cb) {
 
@@ -59,8 +59,7 @@ describe('gulp-if', function() {
 				(file === fakeFile).should.equal(true);
 
 				called++;
-				this.push(file);
-				cb();
+				cb(null, file);
 			}));
 
 			// Assert
@@ -80,25 +79,23 @@ describe('gulp-if', function() {
 			// Arrange
 			var condition = false;
 			var called = 0;
-			var fakeFile = {
+			var fakeFile = new gutil.File({
 				path: tempFile,
 				contents: new Buffer(tempFileContent)
-			};
+			});
 
 			var s = gulpif(condition, through.obj(function (file, enc, cb) {
 				// Test that file got passed through
 				(file === fakeFile).should.equal(true);
 
 				called+=10;
-				this.push(file);
-				cb();
+				cb(null, file);
 			}), through.obj(function (file, enc, cb) {
 				// Test that file got passed through
 				(file === fakeFile).should.equal(true);
 
 				called++;
-				this.push(file);
-				cb();
+				cb(null, file);
 			}));
 
 			// Assert

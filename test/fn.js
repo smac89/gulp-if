@@ -24,8 +24,7 @@ describe('gulp-if', function() {
 				(num % 2).should.equal(0);
 				collect.push(num);
 
-				this.push(file);
-				cb();
+				cb(null, file);
 			});
 
 			var s = gulpif(filter, stream);
