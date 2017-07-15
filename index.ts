@@ -138,7 +138,7 @@ class GulpIfBranch extends PassThrough {
     }
 }
 
-type Condition = boolean | StatCondition | ((vf: Vinyl) => boolean) | RegExp;
+type Condition = boolean | StatCondition | ((vf: Vinyl) => boolean) | string | RegExp;
 type ThunkStream = NodeJS.ReadWriteStream | ((...args: any[]) => NodeJS.ReadWriteStream);
 
 interface StatCondition {
