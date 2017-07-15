@@ -1,4 +1,3 @@
-import * as through from 'through2';
 import {PassThrough, Readable} from 'stream';
 import * as gutil from 'gulp-util';
 import * as Vinyl from 'vinyl';
@@ -53,7 +52,7 @@ class GulpIfBranch extends PassThrough {
                 cb(null, !!match(data, this._condition, opts));
             }
         });
-        this._elseStream = through.obj();
+        this._elseStream = new PassThrough({objectMode: true});
         this.once('pipe', this.fixPlumbing);
     }
 
