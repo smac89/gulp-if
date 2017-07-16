@@ -3,6 +3,7 @@ import * as gutil from 'gulp-util';
 import * as Vinyl from 'vinyl';
 import * as ForkStream from 'fork-stream';
 import {IOptions as MinimatchOpts} from 'minimatch';
+import * as util from "util";
 const match = require('gulp-match');
 
 function If(params: GulpIfOpts, opts?: MinimatchOpts): GulpIfBranch;
@@ -52,8 +53,23 @@ class GulpIfBranch extends PassThrough {
                 cb(null, !!match(data, this._condition, opts));
             }
         });
+        this.forkStream.a.once('data', (content: any) => {
+            this.removeListener('pipe', this.fixPlumbing);
+            this.forkStream.a.pipe(this.thenStream).pipe(this);
+            this.forkStream.a.unshift(content);
+            this.on('pipe', this.fixPlumbing);
+        });
+
+        this.forkStream.b.once('data', (content: any) => {
+            this.removeListener('pipe', this.fixPlumbing);
+            this.forkStream.b.pipe(this.elseStream).pipe(this);
+            this.forkStream.b.unshift(content);
+            this.on('pipe', this.fixPlumbing);
+        });
+
         this._elseStream = new PassThrough({objectMode: true});
-        this.once('pipe', this.fixPlumbing);
+        this.on('pipe', this.fixPlumbing);
+        this.once('finish', () => this.forkStream.end());
     }
 
     public otherwise(stream: ThunkStream, ...args: any[]): this {
@@ -77,20 +93,7 @@ class GulpIfBranch extends PassThrough {
      */
     private fixPlumbing(src: Readable) {
         src.unpipe(this).pipe(this.forkStream);
-
-        this.forkStream.a.once('data', (content: any) => {
-            this.forkStream.a.pipe(this.thenStream).pipe(this);
-            this.forkStream.a.unshift(content);
-        });
-
-        this.forkStream.b.once('data', (content: any) => {
-            this.forkStream.b.pipe(this.elseStream).pipe(this);
-            this.forkStream.b.unshift(content);
-        });
-
-        // No need to do anything in the read method
-        // as we already have a source
-        this._read = super._read;
+        this.straightPipe();
     }
 
     /**
@@ -98,11 +101,17 @@ class GulpIfBranch extends PassThrough {
      * @param size The suggested size to read
      * @private
      */
-    public _read(size?: number) {
+    public _read(size: number) {
         let source = this.condition ? this.thenStream : this.elseStream;
-        this._read = super._read;
+
         this.removeListener('pipe', this.fixPlumbing);
-        source.pipe(this);
+        source.pipe(this).on('pipe', this.fixPlumbing);
+
+        this.straightPipe();
+    }
+
+    public _write(chunk: any, enc: string, cb: Function) {
+        this.forkStream.write(chunk, enc, cb);
     }
 
     /**
@@ -135,6 +144,23 @@ class GulpIfBranch extends PassThrough {
             this._elseStream = this._elseStream();
         }
         return this._elseStream;
+    }
+
+    /**
+     * To be called if there is a pipeline to this stream to ensure
+     * the read and writes are free of any side effects introduced in those methods
+     */
+    private straightPipe() {
+        let writeMethod = this._write;
+        let readMethod = this._read;
+
+        this._write = super._write;
+        this._read = super._read;
+
+        this.once('finish', () => {
+            this._read = readMethod;
+            this._write = writeMethod;
+        });
     }
 }
 
